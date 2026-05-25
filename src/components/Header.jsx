@@ -16,14 +16,14 @@ const SearchIcon = ({ className = "" }) => (
 
 function Header() {
   return (
-    <header className="bg-[#D83D00] rounded-b-[1.5rem] px-5 pt-10 pb-2 shadow-md mb-16">
+    <header className="bg-[#D83D00] rounded-b-[1.5rem] px-5 pt-10 pb-2 shadow-md mb-6">
 
       {/* div dos textos e perfil */}
       <div className="flex justify-between items-start mb-1 gap-1">
 
         {/* textos */}
         <div>
-          <h1 className="text-white text-[1.4rem] font-sans leading-tight"> {/* leading-tight é o espaçamento entre as linhas, colocamos 'tight' pra ser um espaço pequeno! */}
+          <h1 className="text-white text-[1.3rem] font-sans leading-tight"> {/* leading-tight é o espaçamento entre as linhas, colocamos 'tight' pra ser um espaço pequeno! */}
             Sem tempo a perder?<br />
             Peça agora, retire no balcão.
           </h1>
@@ -44,21 +44,10 @@ function Header() {
         </button>
       </div>
 
-      {/* BARRA DE BUSCA (Sobreposta) */}
-      <div className="relative transform translate-y-6 z-10">
-        <input
-          type="text"
-          placeholder="Procure por arroz, sabão, bebidas..."
-          className="w-full bg-white text-gray-700 rounded-full py-4 pl-5 pr-14 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-black-100 focus:outline-none focus:ring-1 focus:ring-[#ea580c] font-medium placeholder:text-gray-400"
-        />
-        {/* Lupa alinhada à DIREITA */}
-        <button className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-800 p-1 hover:text-[#ea580c] transition-colors">
-          <SearchIcon className="h-6 w-6 stroke-2" />
-        </button>
-      </div>
-
     </header>
   );
 }
+
+
 
 export default Header;
