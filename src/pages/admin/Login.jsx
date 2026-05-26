@@ -1,179 +1,156 @@
 import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { loginUsuario } from "../../services/auth.js";
+
+// Componente reutilizável de fundo laranja
+function OrangeBg() {
+    return (
+        <>
+            <div className="absolute inset-0 z-0"
+                style={{ background: "radial-gradient(ellipse 80% 80% at 20% 30%, #ff8c00 0%, #e84800 45%, #c73200 100%)" }}
+            />
+            <div className="absolute inset-0 z-[1]"
+                style={{ background: "radial-gradient(ellipse 55% 60% at 15% 15%, rgba(255,200,80,0.55) 0%, transparent 65%)" }}
+            />
+            <div className="absolute inset-0 z-[1]"
+                style={{ background: "radial-gradient(ellipse 50% 50% at 85% 80%, rgba(255,120,0,0.45) 0%, transparent 65%)" }}
+            />
+        </>
+    );
+}
+
+export { OrangeBg };
 
 export default function Login() {
-    const [login, setLogin] = useState("");
+    const navigate = useNavigate();
+    const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
+    const [erro, setErro] = useState("");
+    const [carregando, setCarregando] = useState(false);
 
-    function handleSubmit(e) {
-        e.preventDefault();
-        // TODO: integrar com autenticação
-        console.log("Login:", login, "Senha:", senha);
+    // Validação básica de e-mail client-side
+    function emailValido(value) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
     }
 
-    return (
-        <div style={styles.wrapper}>
-            {/* Fundo com degradê laranja vibrante e camadas de brilho */}
-            <div style={styles.bgLayer1} />
-            <div style={styles.bgLayer2} />
-            <div style={styles.bgLayer3} />
+    async function handleSubmit(e) {
+        e.preventDefault();
+        setErro("");
 
-            {/* Card glassmorphism */}
-            <form onSubmit={handleSubmit} style={styles.card}>
-                {/* Campo Login */}
-                <div style={styles.inputWrapper}>
-                    <label style={styles.label}>Login:</label>
+        if (!email.trim() || !senha.trim()) {
+            setErro("Preencha e-mail e senha.");
+            return;
+        }
+
+        if (!emailValido(email.trim())) {
+            setErro("Formato de e-mail inválido.");
+            return;
+        }
+
+        setCarregando(true);
+        try {
+            await loginUsuario(email.trim(), senha);
+            // Login bem-sucedido → vai para a home
+            navigate("/home");
+        } catch (err) {
+            setErro(err.message || "email ou senha inválidos");
+        } finally {
+            setCarregando(false);
+        }
+    }
+
+    const inputClass =
+        "w-full px-3.5 py-2.5 rounded-lg text-white text-sm outline-none border border-white/20 focus:border-white/50 focus:ring-2 focus:ring-white/20 transition-all duration-200 disabled:opacity-60";
+    const inputStyle = { background: "rgba(180,70,0,0.32)", boxSizing: "border-box" };
+
+    return (
+        <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#e84800]">
+            <OrangeBg />
+
+            <form
+                onSubmit={handleSubmit}
+                className="relative z-10 w-[92vw] max-w-[340px] sm:w-[420px] sm:max-w-[420px] md:w-[460px] md:max-w-[460px] px-6 py-10 sm:px-10 sm:py-12 rounded-2xl flex flex-col gap-0 border border-white/20"
+                style={{
+                    background: "rgba(210, 90, 0, 0.38)",
+                    backdropFilter: "blur(14px) saturate(1.4)",
+                    WebkitBackdropFilter: "blur(14px) saturate(1.4)",
+                    boxShadow: "0 8px 40px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,220,140,0.2)",
+                }}
+            >
+                {/* Título — desktop only */}
+                <h1 className="hidden sm:block text-white text-2xl font-bold mb-8 text-center tracking-tight">
+                    Área Administrativa
+                </h1>
+
+                {/* Mensagem de erro */}
+                {erro && (
+                    <div className="mb-4 px-3 py-2 rounded-lg bg-red-500/30 border border-red-400/40 text-white text-sm text-center">
+                        {erro}
+                    </div>
+                )}
+
+                {/* Campo E-mail */}
+                <div className="flex flex-col gap-1.5 mb-5">
+                    <label htmlFor="login-email" className="text-white/90 text-sm font-medium tracking-wide">
+                        E-mail:
+                    </label>
                     <input
                         id="login-email"
-                        type="text"
-                        value={login}
-                        onChange={(e) => setLogin(e.target.value)}
-                        style={styles.input}
-                        autoComplete="username"
-                        placeholder=""
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="usuario@email.com"
+                        autoComplete="email"
+                        disabled={carregando}
+                        className={inputClass}
+                        style={inputStyle}
                     />
                 </div>
 
                 {/* Campo Senha */}
-                <div style={styles.inputWrapper}>
-                    <label style={styles.label}>Senha:</label>
+                <div className="flex flex-col gap-1.5 mb-5">
+                    <label htmlFor="login-senha" className="text-white/90 text-sm font-medium tracking-wide">
+                        Senha:
+                    </label>
                     <input
                         id="login-senha"
                         type="password"
                         value={senha}
                         onChange={(e) => setSenha(e.target.value)}
-                        style={styles.input}
                         autoComplete="current-password"
-                        placeholder=""
+                        disabled={carregando}
+                        className={inputClass}
+                        style={inputStyle}
                     />
                 </div>
 
                 {/* Botão Entrar */}
-                <button id="login-submit" type="submit" style={styles.button}>
-                    Entrar
+                <button
+                    id="login-submit"
+                    type="submit"
+                    disabled={carregando}
+                    className="mt-2 w-full py-3 rounded-xl text-white text-base font-semibold tracking-wide transition-all duration-200 hover:brightness-110 active:scale-95 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    style={{
+                        background: "rgba(160, 55, 0, 0.80)",
+                        boxShadow: "0 2px 12px rgba(0,0,0,0.25)",
+                    }}
+                >
+                    {carregando ? (
+                        <>
+                            <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                            Entrando...
+                        </>
+                    ) : "Entrar"}
                 </button>
 
                 {/* Link cadastro */}
-                <p style={styles.registerText}>
+                <p className="mt-5 text-center text-white/85 text-sm">
                     Não tem uma conta?{" "}
-                    <a href="/cadastro" style={styles.registerLink}>
+                    <Link to="/cadastro" className="text-white font-semibold underline cursor-pointer hover:opacity-80 transition-opacity">
                         Cadastre-se
-                    </a>
+                    </Link>
                 </p>
             </form>
         </div>
     );
 }
-
-const styles = {
-    wrapper: {
-        position: "relative",
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        overflow: "hidden",
-        backgroundColor: "#e84800",
-    },
-
-    // Camada base do degradê
-    bgLayer1: {
-        position: "absolute",
-        inset: 0,
-        background:
-            "radial-gradient(ellipse 80% 80% at 20% 30%, #ff8c00 0%, #e84800 45%, #c73200 100%)",
-        zIndex: 0,
-    },
-
-    // Brilho superior esquerdo (reflexo claro)
-    bgLayer2: {
-        position: "absolute",
-        inset: 0,
-        background:
-            "radial-gradient(ellipse 55% 60% at 15% 15%, rgba(255,200,80,0.55) 0%, transparent 65%)",
-        zIndex: 1,
-    },
-
-    // Brilho inferior direito
-    bgLayer3: {
-        position: "absolute",
-        inset: 0,
-        background:
-            "radial-gradient(ellipse 50% 50% at 85% 80%, rgba(255,120,0,0.45) 0%, transparent 65%)",
-        zIndex: 1,
-    },
-
-    // Card translúcido
-    card: {
-        position: "relative",
-        zIndex: 10,
-        width: "min(340px, 88vw)",
-        padding: "48px 36px 40px",
-        borderRadius: "20px",
-        background: "rgba(210, 90, 0, 0.38)",
-        backdropFilter: "blur(14px) saturate(1.4)",
-        WebkitBackdropFilter: "blur(14px) saturate(1.4)",
-        border: "1px solid rgba(255,200,120,0.22)",
-        boxShadow:
-            "0 8px 40px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,220,140,0.2)",
-        display: "flex",
-        flexDirection: "column",
-        gap: "0",
-    },
-
-    inputWrapper: {
-        display: "flex",
-        flexDirection: "column",
-        gap: "6px",
-        marginBottom: "18px",
-    },
-
-    label: {
-        color: "rgba(255,255,255,0.9)",
-        fontSize: "14px",
-        fontWeight: "500",
-        letterSpacing: "0.3px",
-    },
-
-    input: {
-        width: "100%",
-        padding: "10px 14px",
-        borderRadius: "8px",
-        border: "1px solid rgba(255,200,120,0.3)",
-        background: "rgba(180,70,0,0.32)",
-        color: "#fff",
-        fontSize: "14px",
-        outline: "none",
-        transition: "border-color 0.2s, box-shadow 0.2s",
-        boxSizing: "border-box",
-    },
-
-    button: {
-        marginTop: "10px",
-        width: "100%",
-        padding: "12px",
-        borderRadius: "10px",
-        border: "none",
-        background: "rgba(160, 55, 0, 0.75)",
-        color: "#fff",
-        fontSize: "15px",
-        fontWeight: "600",
-        letterSpacing: "0.4px",
-        cursor: "pointer",
-        transition: "background 0.2s, transform 0.1s",
-        boxShadow: "0 2px 12px rgba(0,0,0,0.2)",
-    },
-
-    registerText: {
-        marginTop: "18px",
-        textAlign: "center",
-        color: "rgba(255,255,255,0.85)",
-        fontSize: "13px",
-    },
-
-    registerLink: {
-        color: "#fff",
-        fontWeight: "600",
-        textDecoration: "underline",
-        cursor: "pointer",
-    },
-};
