@@ -6,6 +6,7 @@
   font-weight: normal;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'PP-Mori-italic';
   src: url('./fonts/ppmori-italic.otf') format('opentype');
@@ -13,7 +14,7 @@
   font-style: normal;
 }
 
-@theme{
-    --font-sans: "PP-Mori", sans-serif;
-    --font-display: "PP-Mori-italic", sans-serif;
+@theme {
+  --font-sans: "PP-Mori", sans-serif;
+  --font-display: "PP-Mori-italic", sans-serif;
 }
