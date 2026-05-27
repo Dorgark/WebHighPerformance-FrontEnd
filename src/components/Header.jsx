@@ -39,8 +39,8 @@ function Header() {
         </div>
 
         {/* Lado Direito: Botão de Perfil */}
-        <button className="bg-white p-2.5 rounded-full shadow-sm hover:scale-105 border transition-transform flex-shrink-0">
-          <UserIcon size={30} color="#000000"  />
+        <button className="bg-white p-2.5 rounded-full shadow-sm hover:scale-105 border-[0.15rem] transition-transform flex-shrink-0">
+          <UserIcon size={25} color="#000000"  />
         </button>
       </div>
 
