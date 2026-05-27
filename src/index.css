@@ -17,3 +17,10 @@
     --font-sans: "PP-Mori", sans-serif;
     --font-display: "PP-Mori-italic", sans-serif;
 }
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE e Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari e Opera */
+}
