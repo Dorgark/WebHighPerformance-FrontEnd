@@ -1,5 +1,5 @@
 // URL base da API — configure VITE_API_URL no .env (ex: http://localhost:3000)
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL || "https://web-high-performance-back-end.vercel.app";
 
 /**
  * Faz login e salva o token JWT no localStorage.
