@@ -12,12 +12,6 @@ import Filtros from "./components/Filter.jsx";
 import Login from "./pages/admin/Login.jsx";
 import Cadastro from "./pages/admin/Cadastro.jsx";
 
-// ── NOVO: carrinho ─────────────────────────────────────────────────────────────
-import { CartProvider, useCart } from "./context/CartContext.jsx";
-import CartDrawer from "./pages/client/CartDrawer.jsx";
-import BotaoCarrinho from "./components/BotaoCarrinho.jsx";
-// ──────────────────────────────────────────────────────────────────────────────
-
 // ─── Rota protegida ────────────────────────────────────────────────────────────
 function ProtectedRoute({ children }) {
   if (!isAuthenticated()) {
@@ -44,8 +38,6 @@ function Home() {
   const [produtoModal, setProdutoModal] = useState(null);
 
   const [termoBusca, setTermoBusca] = useState("");
-
-  const { adicionarItem } = useCart(); // ── NOVO
 
   useEffect(() => {
     const buscarDadosDoBanco = async () => {
@@ -83,7 +75,7 @@ function Home() {
   const produtosFiltrados = termoBusca
     ? todosOsProdutos.filter(produto =>
       produto.name.toLowerCase().includes(termoBusca.toLowerCase()) ||
-      produto.type.toLowerCase().includes(termoBusca.toLowerCase())
+      produto.type.toLowerCase().includes(termoBusca.toLowerCase()) // Permite buscar por categoria também!
     )
     : [];
 
@@ -108,13 +100,14 @@ function Home() {
 
             {produtosFiltrados.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 pb-10">
+                {/* Desenha a grelha mas AGORA usando a lista de produtosFiltrados! */}
                 {produtosFiltrados.map((produto) => (
                   <div
                     key={produto.id || produto._id}
                     className="cursor-pointer transform transition-transform hover:-translate-y-1"
                     onClick={() => setProdutoModal(produto)}
                   >
-                    <Card imagem={null} titulo={produto.name} preco={produto.price} produto={produto} /> {/* ── NOVO: prop produto */}
+                    <Card imagem={null} titulo={produto.name} preco={produto.price} />
                   </div>
                 ))}
               </div>
@@ -150,7 +143,7 @@ function Home() {
                     className="cursor-pointer transform transition-transform hover:-translate-y-1"
                     onClick={() => setProdutoModal(produto)}
                   >
-                    <Card imagem={null} titulo={produto.name} preco={produto.price} produto={produto} /> {/* ── NOVO: prop produto */}
+                    <Card imagem={null} titulo={produto.name} preco={produto.price} />
                   </div>
                 ))}
             </div>
@@ -167,6 +160,7 @@ function Home() {
                   {categoria.nome}
                 </h2>
 
+                {/* Botão Ver Mais no cabeçalho se houver mais de 5 itens */}
                 {categoria?.produtos?.length > 5 && (
                   <button
                     onClick={() => setCategoriaAtiva(categoria.nome)}
@@ -178,16 +172,18 @@ function Home() {
               </div>
 
               <div className="flex overflow-x-auto gap-5 px-4 pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth">
+                {/* Limita a exibição a 5 produtos usando o slice() */}
                 {categoria?.produtos?.slice(0, 5).map((produto) => (
                   <div
                     key={produto.id || produto._id}
                     className="min-w-[160px] max-w-[200px] snap-center transition-transform duration-300 hover:-translate-y-2 cursor-pointer"
                     onClick={() => setProdutoModal(produto)}
                   >
-                    <Card imagem={null} titulo={produto.name} preco={produto.price} produto={produto} /> {/* ── NOVO: prop produto */}
+                    <Card imagem={null} titulo={produto.name} preco={produto.price} />
                   </div>
                 ))}
 
+                {/* Card extra "Ver todos" no fim do carrossel se houver mais de 5 itens */}
                 {categoria?.produtos?.length > 5 && (
                   <div className="min-w-[140px] snap-center flex p-1">
                     <button
@@ -256,7 +252,7 @@ function Home() {
 
                 <button
                   onClick={() => {
-                    adicionarItem(produtoModal); // ── NOVO: era alert('Adicionado!')
+                    alert('Adicionado!');
                     setProdutoModal(null);
                   }}
                   className="bg-[#ea580c] text-white px-6 py-3 rounded-xl font-bold shadow-md hover:bg-orange-700 hover:-translate-y-1 transition-all"
@@ -268,8 +264,6 @@ function Home() {
           </div>
         </div>
       )}
-
-      <BotaoCarrinho /> {/* ── NOVO: botão flutuante do carrinho */}
     </div>
   );
 }
@@ -277,38 +271,34 @@ function Home() {
 // ─── Componente Principal (Diretor de Rotas) ───────────────────────────────────
 function App() {
   return (
-    <CartProvider> {/* ── NOVO: envolve tudo no provider do carrinho */}
-      <BrowserRouter>
-        <Routes>
-          {/* Rota principal TOTALMENTE LIVRE */}
-          <Route path="/" element={<Home />} />
+    <BrowserRouter>
+      <Routes>
+        {/* Rota principal TOTALMENTE LIVRE */}
+        <Route path="/" element={<Home />} />
 
-          <Route path="/carrinho" element={<CartDrawer />} /> {/* ── NOVO */}
+        {/* Rotas de Admin (Requer Login) */}
+        <Route
+          path="/admin/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/cadastro"
+          element={
+            <PublicRoute>
+              <Cadastro />
+            </PublicRoute>
+          }
+        />
 
-          {/* Rotas de Admin (Requer Login) */}
-          <Route
-            path="/admin/login"
-            element={
-              <PublicRoute>
-                <Login />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/cadastro"
-            element={
-              <PublicRoute>
-                <Cadastro />
-              </PublicRoute>
-            }
-          />
-
-          {/* Redirecionamentos de Segurança */}
-          <Route path="/home" element={<Navigate to="/" replace />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </CartProvider>
+        {/* Redirecionamentos de Segurança */}
+        <Route path="/home" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
