@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const UserIcon = ({ size = 24, color = "currentColor" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width={size} height={size} fill={color}>
@@ -39,9 +40,9 @@ function Header() {
         </div>
 
         {/* Lado Direito: Botão de Perfil */}
-        <button className="bg-white p-2.5 rounded-full shadow-sm hover:scale-105 border transition-transform flex-shrink-0">
-          <UserIcon size={30} color="#000000"  />
-        </button>
+        <Link to={'/admin/login'} className="bg-white p-2.5 rounded-full shadow-sm hover:scale-105 border-[0.15rem] transition-transform flex-shrink-0">
+          <UserIcon size={25} color="#000000"  />
+        </Link>
       </div>
 
     </header>
