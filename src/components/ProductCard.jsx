@@ -1,13 +1,13 @@
 import React from "react";
 
-export default function Card ({ imagem, titulo, preco}) {
-     return(
+export default function Card({ imagem, titulo, preco }) {
+    return (
 
         <div className="w-full h-full flex flex-col my-2 bg-white border border-[#4F6D7A] rounded-xl overflow-hidden hover:shadow-md transition-shadow">
             <div className="bg-gray-50 h-[60%] w-full flex items-center justify-center p-4">
                 {imagem ? (
                     <img src={imagem} alt={titulo} className="max-h-full object-contain" />
-                ) :(
+                ) : (
                     <span className="text-slate-300 text-sm">Sem imagem</span>
                 )}
             </div>
@@ -26,7 +26,7 @@ export default function Card ({ imagem, titulo, preco}) {
                         {"+"}
                     </button>
                 </div>
-        </div>
+            </div>
         </div>
     )
 };

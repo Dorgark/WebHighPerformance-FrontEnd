@@ -6,6 +6,7 @@ import { isAuthenticated } from "./services/auth.js";
 import Header from "./components/Header.jsx";
 import BarraBusca from "./components/BarraBusca.jsx";
 import Card from "./components/ProductCard.jsx";
+import Filtros from "./components/Filter.jsx";
 
 // Páginas
 import Login from "./pages/admin/Login.jsx";
@@ -72,20 +73,21 @@ function Home() {
   const todosOsProdutos = categorias.flatMap(categoria => categoria.produtos);
   const produtosFiltrados = termoBusca
     ? todosOsProdutos.filter(produto =>
-        produto.name.toLowerCase().includes(termoBusca.toLowerCase()) ||
-        produto.type.toLowerCase().includes(termoBusca.toLowerCase()) // Permite buscar por categoria também!
-      )
+      produto.name.toLowerCase().includes(termoBusca.toLowerCase()) ||
+      produto.type.toLowerCase().includes(termoBusca.toLowerCase()) // Permite buscar por categoria também!
+    )
     : [];
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans pb-20 relative">
       <Header />
       <BarraBusca termoBusca={termoBusca} setTermoBusca={setTermoBusca} />
+      <Filtros categorias={categorias} categoriaAtiva={categoriaAtiva} setCategoriaAtiva={setCategoriaAtiva} />
 
       <main className="px-5">
         {estaCarregando ? (
           <p className="text-center mt-10">Carregando...</p>
-          ) : termoBusca ? (
+        ) : termoBusca ? (
 
           <div className="animate-in fade-in duration-300">
             <div className="flex items-center justify-between mb-6 px-2">
@@ -139,7 +141,7 @@ function Home() {
                   >
                     <Card imagem={null} titulo={produto.name} preco={produto.price} />
                   </div>
-              ))}
+                ))}
             </div>
           </div>
 
