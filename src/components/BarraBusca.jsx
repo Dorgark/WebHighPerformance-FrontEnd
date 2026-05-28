@@ -6,24 +6,23 @@ const SearchIcon = ({ className = "" }) => (
   </svg>
 );
 
-// 1. Recebemos o termoBusca e setTermoBusca que vêm do App.jsx
+// puxamos como parametros o useState pra pesquisar.
 function BarraBusca({ termoBusca, setTermoBusca }) {
 
   const lidarComMudanca = (evento) => {
     const textoDigitado = evento.target.value;
-    // 2. Usamos o setTermoBusca que vem de fora para avisar o App.jsx
+    // evento.target.value é o que for digitado pelo usuário. a gente envia esse valor pro set.
     setTermoBusca(textoDigitado);
     console.log("A procurar por:", textoDigitado);
   }
 
-  // 3. O teu return continua EXATAMENTE igual, apenas mudei o 'value' do input
   return(
     <div className="relative flex justify-center w-full">
       <div className="relative mb-4 w-full justify-center mx-10 max-w-md">
         <input
           type="text"
           placeholder="Procure por arroz, sabão, bebidas..."
-          value={termoBusca} // O valor agora vem do App.jsx
+          value={termoBusca} 
           onChange={lidarComMudanca}
           className="flex justify-center w-full px-3 py-2 pr-12 rounded-[0.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-black-100 focus:outline-none focus:border-none focus:ring-2 focus:ring-[#ea580c] "
         ></input>
