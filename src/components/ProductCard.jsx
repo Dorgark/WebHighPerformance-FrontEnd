@@ -4,7 +4,6 @@ export default function Card ({ imagem, titulo, preco}) {
      return(
 
         <div className="w-full h-full flex flex-col my-2 bg-white border border-[#4F6D7A] rounded-xl overflow-hidden hover:shadow-md transition-shadow">
-            {/* imagem do card */}
             <div className="bg-gray-50 h-[60%] w-full flex items-center justify-center p-4">
                 {imagem ? (
                     <img src={imagem} alt={titulo} className="max-h-full object-contain" />

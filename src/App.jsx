@@ -27,21 +27,20 @@ function PublicRoute({ children }) {
   return children;
 }
 
-// ─── Página Home (A tua grid de produtos ligada à API) ────────────────────────
+// ─── Página Home ────────────────────────
 function Home() {
   const [categorias, setCategorias] = useState([]);
   const [estaCarregando, setEstaCarregando] = useState(true);
 
-  // Estados para Interatividade
+  // hooks!
   const [categoriaAtiva, setCategoriaAtiva] = useState(null);
   const [produtoModal, setProdutoModal] = useState(null);
-
   const [termoBusca, setTermoBusca] = useState("");
 
   useEffect(() => {
     const buscarDadosDoBanco = async () => {
       try {
-        const resposta = await fetch('https://web-high-performance-back-end.vercel.app/api/products/');
+        const resposta = await fetch('https://webhighperformance-backend.onrender.com/');
         const produtosDaAPI = await resposta.json();
 
         const categoriasAgrupadas = {};
@@ -88,7 +87,6 @@ function Home() {
           <p className="text-center mt-10">Carregando...</p>
           ) : termoBusca ? (
 
-          /* === AQUI É A NOVA TELA QUE DESENHEI (MODO DE BUSCA) === */
           <div className="animate-in fade-in duration-300">
             <div className="flex items-center justify-between mb-6 px-2">
               <h2 className="text-black font-bold text-xl">
@@ -98,7 +96,6 @@ function Home() {
 
             {produtosFiltrados.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 pb-10">
-                {/* Desenha a grelha mas AGORA usando a lista de produtosFiltrados! */}
                 {produtosFiltrados.map((produto) => (
                   <div
                     key={produto.id || produto._id}
@@ -118,7 +115,6 @@ function Home() {
 
         ) : categoriaAtiva ? (
 
-          /* === MODO FILTRO (Visualiza apenas uma categoria) === */
           <div className="animate-in fade-in slide-in-from-right-4 duration-300">
             <button
               onClick={() => setCategoriaAtiva(null)}
@@ -149,7 +145,7 @@ function Home() {
 
         ) : (
 
-          /* === MODO INICIAL (Visualiza todas as categorias com limite de 5 itens) === */
+
           categorias?.map((categoria) => (
             <section key={categoria.nome} className="mb-8">
 
@@ -158,7 +154,6 @@ function Home() {
                   {categoria.nome}
                 </h2>
 
-                {/* Botão Ver Mais no cabeçalho se houver mais de 5 itens */}
                 {categoria?.produtos?.length > 5 && (
                   <button
                     onClick={() => setCategoriaAtiva(categoria.nome)}
@@ -170,7 +165,6 @@ function Home() {
               </div>
 
               <div className="flex overflow-x-auto gap-5 px-4 pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth">
-                {/* Limita a exibição a 5 produtos usando o slice() */}
                 {categoria?.produtos?.slice(0, 5).map((produto) => (
                   <div
                     key={produto.id || produto._id}
@@ -181,7 +175,6 @@ function Home() {
                   </div>
                 ))}
 
-                {/* Card extra "Ver todos" no fim do carrossel se houver mais de 5 itens */}
                 {categoria?.produtos?.length > 5 && (
                   <div className="min-w-[140px] snap-center flex p-1">
                     <button
@@ -199,7 +192,7 @@ function Home() {
         )}
       </main>
 
-      {/* === MODAL DE DETALHES DO PRODUTO === */}
+      {/* modal do produto.*/}
       {produtoModal && (
         <div
           className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in"
@@ -209,7 +202,6 @@ function Home() {
             className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Botão Fechar */}
             <button
               onClick={() => setProdutoModal(null)}
               className="absolute top-3 right-3 bg-white/80 p-2 rounded-full text-gray-500 hover:text-gray-800 transition-colors z-10"
@@ -217,7 +209,7 @@ function Home() {
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path></svg>
             </button>
 
-            {/* Imagem do Produto (ou placeholder) */}
+
             <div className="h-48 w-full bg-gray-100 flex items-center justify-center p-4">
               <div className="text-gray-300 flex flex-col items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 256 256"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM216,56V158.05l-45.66-45.65a16,16,0,0,0-22.62,0L96,164.05,62.28,130.34a16,16,0,0,0-22.62,0L24,146.05V56ZM24,168.69l27-27,45.65,45.66a16,16,0,0,0,22.63,0L171,135.66l45,45V200H24Z"></path></svg>
@@ -271,8 +263,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Rota principal TOTALMENTE LIVRE */}
         <Route path="/" element={<Home />} />
+        {/* rota principal é a home. */}
 
         {/* Rotas de Admin (Requer Login) */}
         <Route

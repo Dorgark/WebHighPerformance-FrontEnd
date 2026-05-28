@@ -217,7 +217,7 @@ export default function Cadastro() {
                 {/* Link de volta ao login */}
                 <p className="mt-5 text-center text-white/85 text-sm">
                     Já tem uma conta?{" "}
-                    <Link to="/" className="text-white font-semibold underline cursor-pointer hover:opacity-80 transition-opacity">
+                    <Link to="/admin/login" className="text-white font-semibold underline cursor-pointer hover:opacity-80 transition-opacity">
                         Entrar
                     </Link>
                 </p>
