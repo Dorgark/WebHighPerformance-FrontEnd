@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { isAuthenticated } from "./services/auth.js";
 
-// Componentes
+// Junior Componentes
 import Header from "./components/Header.jsx";
 import BarraBusca from "./components/BarraBusca.jsx";
 import Card from "./components/ProductCard.jsx";
