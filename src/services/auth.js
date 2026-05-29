@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || "https://webhighperformance-backend.onrender.com/";
+const API_URL = import.meta.env.VITE_API_URL || "https://webhighperformance-backend.onrender.com";
 
 
 export async function loginUsuario(email, password) {
