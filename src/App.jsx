@@ -41,7 +41,7 @@ function Home() {
   useEffect(() => {
     const buscarDadosDoBanco = async () => {
       try {
-        const resposta = await fetch('https://webhighperformance-backend.onrender.com/');
+        const resposta = await fetch('https://webhighperformance-backend.onrender.com/api/products/');
         const produtosDaAPI = await resposta.json();
 
         const categoriasAgrupadas = {};
