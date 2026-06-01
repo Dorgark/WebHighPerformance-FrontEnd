@@ -11,6 +11,7 @@ import Filtros from "./components/Filter.jsx";
 // Páginas
 import Login from "./pages/admin/Login.jsx";
 import Cadastro from "./pages/admin/Cadastro.jsx";
+import Dashboard from "./pages/admin/Dashboard.jsx";
 
 // ─── Rota protegida ────────────────────────────────────────────────────────────
 function ProtectedRoute({ children }) {
@@ -41,7 +42,7 @@ function Home() {
   useEffect(() => {
     const buscarDadosDoBanco = async () => {
       try {
-        const resposta = await fetch('https://webhighperformance-backend.onrender.com/');
+        const resposta = await fetch('https://webhighperformance-backend.onrender.com/api/products/');
         const produtosDaAPI = await resposta.json();
 
         const categoriasAgrupadas = {};
@@ -283,6 +284,14 @@ function App() {
             <PublicRoute>
               <Cadastro />
             </PublicRoute>
+          }
+        />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
           }
         />
 

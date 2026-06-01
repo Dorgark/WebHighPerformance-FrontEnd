@@ -51,16 +51,16 @@ export default function Login() {
         setCarregando(true);
         try {
             const data = await loginUsuario(email.trim(), senha);
-            
+
             // Tenta obter o nome vindo da API, senão deduz do e-mail
             const parteNome = email.trim().split("@")[0];
             const nomeFormatado = parteNome.charAt(0).toUpperCase() + parteNome.slice(1);
             const nomeExibicao = data?.name || data?.user?.name || nomeFormatado;
-            
+
             localStorage.setItem("userName", nomeExibicao);
-            
-            // Login bem-sucedido → vai para a home
-            navigate("/home");
+
+            // Login bem-sucedido → vai para o dashboard administrativo
+            navigate("/admin/dashboard");
         } catch (err) {
             setErro(err.message || "email ou senha inválidos");
         } finally {
@@ -110,7 +110,9 @@ export default function Login() {
                     Voltar
                 </button>
 
-                {/* Título — desktop only */}
+
+
+                {/* Título */}
                 <h1 className="text-white text-xl sm:text-2xl font-bold mb-8 text-center tracking-tight">
                     Área Administrativa
                 </h1>

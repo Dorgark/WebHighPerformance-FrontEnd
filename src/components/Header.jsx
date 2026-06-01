@@ -75,6 +75,12 @@ function Header() {
               <span className="text-white text-xs font-semibold text-center leading-tight max-w-[90px] truncate">
                 {nomeUsuario}
               </span>
+              <Link
+                to="/admin/dashboard"
+                className="bg-white/15 hover:bg-white/25 active:scale-95 text-white text-[10px] uppercase font-bold py-1 px-2.5 rounded-md border border-white/20 transition-all cursor-pointer text-center"
+              >
+                Dashboard
+              </Link>
               <button
                 onClick={handleLogout}
                 className="bg-white/15 hover:bg-white/25 active:scale-95 text-white text-[10px] uppercase font-bold py-1 px-2.5 rounded-md border border-white/20 transition-all cursor-pointer"
