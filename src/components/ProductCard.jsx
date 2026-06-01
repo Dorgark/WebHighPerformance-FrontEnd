@@ -1,8 +1,17 @@
 import React from "react";
+import { useCart } from "../context/CartContext";
 
-export default function Card({ imagem, titulo, preco }) {
+export default function Card({ imagem, titulo, preco, produto }) {
+    const { adicionarItem } = useCart();
+
+    function handleAdicionar(e) {
+        e.stopPropagation(); // não abre o modal ao clicar no "+"
+        if (produto) {
+            adicionarItem(produto);
+        }
+    }
+
     return (
-
         <div className="w-full h-full flex flex-col my-2 bg-white border border-[#4F6D7A] rounded-xl overflow-hidden hover:shadow-md transition-shadow">
             <div className="bg-gray-50 h-[60%] w-full flex items-center justify-center p-4">
                 {imagem ? (
@@ -18,15 +27,16 @@ export default function Card({ imagem, titulo, preco }) {
                 </h2>
 
                 <div className="flex items-center justify-between mt-auto gap-1">
-                    <span className="text-[#4F6D7A] font-bold text-lg">
-                        R$ {preco}
-                    </span>
+                    <span className="text-[#4F6D7A] font-bold text-lg">R$ {preco}</span>
 
-                    <button className="bg-[#ea580c] text-white py-2 px-4 rounded-md hover:bg-orange-500 transition-colors">
-                        {"+"}
+                    <button
+                        onClick={handleAdicionar}
+                        className="bg-[#ea580c] text-white py-2 px-4 rounded-md hover:bg-orange-500 active:scale-95 transition-all"
+                    >
+                        +
                     </button>
                 </div>
             </div>
         </div>
-    )
-};
+    );
+}
