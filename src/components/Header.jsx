@@ -1,5 +1,6 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { isAuthenticated, logout } from "../services/auth.js";
 
 const UserIcon = ({ size = 24, color = "currentColor" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width={size} height={size} fill={color}>
@@ -16,8 +17,33 @@ const SearchIcon = ({ className = "" }) => (
 );
 
 function Header() {
+  const navigate = useNavigate();
+  const [logado, setLogado] = useState(isAuthenticated());
+  const [nomeUsuario, setNomeUsuario] = useState(localStorage.getItem("userName") || "");
+
+  // Monitora alterações de login caso ocorram em tempo real na mesma aba
+  useEffect(() => {
+    const verificarStatus = () => {
+      setLogado(isAuthenticated());
+      setNomeUsuario(localStorage.getItem("userName") || "");
+    };
+
+    window.addEventListener("storage", verificarStatus);
+    return () => {
+      window.removeEventListener("storage", verificarStatus);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    localStorage.removeItem("userName");
+    setLogado(false);
+    setNomeUsuario("");
+    navigate("/");
+  };
+
   return (
-    <header className="bg-[#D83D00] rounded-b-[1.5rem] px-5 pt-10 pb-2 shadow-md mb-6">
+    <header className="bg-[#D83D00] rounded-b-[1.5rem] px-5 pt-10 pb-4 shadow-md mb-6">
 
       {/* div dos textos e perfil */}
       <div className="flex justify-between items-start mb-1 gap-1">
@@ -39,16 +65,33 @@ function Header() {
           </div>
         </div>
 
-        {/* Lado Direito: Botão de Perfil */}
-        <Link to={'/admin/login'} className="bg-white p-2.5 rounded-full shadow-sm hover:scale-105 border-[0.15rem] transition-transform flex-shrink-0">
-          <UserIcon size={25} color="#000000"  />
-        </Link>
+        {/* Lado Direito: Botão de Perfil se deslogado / Nome + Sair se logado */}
+        <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+          {logado ? (
+            <>
+              <div className="bg-white p-2.5 rounded-full shadow-sm border-[0.15rem] border-white/10 flex-shrink-0">
+                <UserIcon size={25} color="#000000" />
+              </div>
+              <span className="text-white text-xs font-semibold text-center leading-tight max-w-[90px] truncate">
+                {nomeUsuario}
+              </span>
+              <button
+                onClick={handleLogout}
+                className="bg-white/15 hover:bg-white/25 active:scale-95 text-white text-[10px] uppercase font-bold py-1 px-2.5 rounded-md border border-white/20 transition-all cursor-pointer"
+              >
+                Sair
+              </button>
+            </>
+          ) : (
+            <Link to={'/admin/login'} className="bg-white p-2.5 rounded-full shadow-sm hover:scale-105 border-[0.15rem] transition-transform flex-shrink-0">
+              <UserIcon size={25} color="#000000" />
+            </Link>
+          )}
+        </div>
       </div>
 
     </header>
   );
 }
-
-
 
 export default Header;

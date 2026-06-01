@@ -11,6 +11,7 @@ import Filtros from "./components/Filter.jsx";
 // Páginas
 import Login from "./pages/admin/Login.jsx";
 import Cadastro from "./pages/admin/Cadastro.jsx";
+import Home from "./pages/Home.jsx";
 
 // ── NOVO: carrinho ─────────────────────────────────────────────────────────────
 import { CartProvider, useCart } from "./context/CartContext.jsx";
