@@ -63,6 +63,11 @@ const IcBusca = () => (
         <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
     </svg>
 );
+const IcMenu = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256">
+        <path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z" />
+    </svg>
+);
 
 // ─── CATEGORIAS ───────────────────────────────────────────────────────────────
 const CATEGORIAS = ["Limpeza", "Higiene", "Descartáveis", "Construção", "Outros"];
@@ -84,7 +89,7 @@ function useToasts() {
 function ToastContainer({ toasts, onRemove }) {
     if (!toasts.length) return null;
     return (
-        <div className="fixed bottom-6 right-4 z-[300] flex flex-col gap-2 pointer-events-none">
+        <div className="fixed bottom-4 md:bottom-6 right-2 md:right-4 z-[300] flex flex-col gap-2 pointer-events-none max-w-[calc(100vw-16px)]">
             {toasts.map((t) => (
                 <div
                     key={t.id}
@@ -98,10 +103,10 @@ function ToastContainer({ toasts, onRemove }) {
             ${t.type === "warning" ? "bg-amber-500" : ""}
           `}
                 >
-                    <span className="w-6 h-6 rounded-full bg-white/25 flex items-center justify-center flex-shrink-0">
+                    <span className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-white/25 flex items-center justify-center flex-shrink-0">
                         {t.type === "success" ? <IcCheck /> : <IcAviso />}
                     </span>
-                    {t.message}
+                    <span className="break-words">{t.message}</span>
                 </div>
             ))}
         </div>
@@ -114,10 +119,9 @@ const NAV = [
     { id: "produtos", label: "Produtos", icon: <IcPacote /> },
 ];
 
-function Sidebar({ ativa, onNavegar, onSair }) {
-    return (
-        <aside className="w-60 min-h-screen bg-[#D83D00] flex flex-col flex-shrink-0">
-            {/* Marca */}
+function Sidebar({ ativa, onNavegar, onSair, mobileAberta, onFecharMobile }) {
+    const content = (
+        <>
             <div className="px-5 pt-10 pb-7 border-b border-white/20">
                 <div className="flex items-center gap-3">
                     <div className="w-9 h-9 bg-white/20 rounded-2xl flex items-center justify-center">
@@ -129,13 +133,11 @@ function Sidebar({ ativa, onNavegar, onSair }) {
                     </div>
                 </div>
             </div>
-
-            {/* Navegação */}
             <nav className="flex-1 px-3 pt-5 flex flex-col gap-1">
                 {NAV.map((item) => (
                     <button
                         key={item.id}
-                        onClick={() => onNavegar(item.id)}
+                        onClick={() => { onNavegar(item.id); onFecharMobile?.(); }}
                         className={`
               w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl
               text-sm font-semibold text-left transition-all duration-150
@@ -151,18 +153,41 @@ function Sidebar({ ativa, onNavegar, onSair }) {
                     </button>
                 ))}
             </nav>
-
-            {/* Botão sair */}
             <div className="px-3 pb-8">
                 <button
-                    onClick={onSair}
+                    onClick={() => { onSair(); onFecharMobile?.(); }}
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-semibold text-white/65 hover:bg-white/15 hover:text-white transition-all duration-150"
                 >
                     <IcSair />
                     Sair
                 </button>
             </div>
-        </aside>
+        </>
+    );
+
+    return (
+        <>
+            {/* Desktop sidebar */}
+            <aside className="hidden md:flex w-60 min-h-screen bg-[#D83D00] flex-col flex-shrink-0">
+                {content}
+            </aside>
+
+            {/* Mobile sidebar overlay */}
+            {mobileAberta && (
+                <div className="fixed inset-0 z-50 flex md:hidden">
+                    <div className="absolute inset-0 bg-black/50 transition-opacity duration-200" onClick={onFecharMobile} />
+                    <aside className="relative w-60 h-full bg-[#D83D00] flex flex-col shadow-2xl transition-transform duration-200">
+                        <button
+                            onClick={onFecharMobile}
+                            className="absolute top-4 right-4 text-white/70 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors"
+                        >
+                            <IcFechar />
+                        </button>
+                        {content}
+                    </aside>
+                </div>
+            )}
+        </>
     );
 }
 
@@ -196,10 +221,13 @@ function ModalProduto({ aberto, onFechar, onSalvar, editando, salvando }) {
         setErros({});
     }, [aberto, editando]);
 
+    const normalizarPreco = (v) => String(v).replace(",", ".");
+
     const validar = () => {
         const e = {};
         if (!form.name.trim()) e.name = "Nome obrigatório";
-        if (!form.price || isNaN(form.price) || +form.price <= 0) e.price = "Preço inválido";
+        const precoNorm = normalizarPreco(form.price);
+        if (!precoNorm || isNaN(precoNorm) || +precoNorm <= 0) e.price = "Preço inválido";
         if (!form.type) e.type = "Selecione uma categoria";
         setErros(e);
         return !Object.keys(e).length;
@@ -438,15 +466,15 @@ function TabelaProdutos({ produtos, onEditar, onExcluir, carregando }) {
 
     return (
         <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-xs md:text-sm">
                 <thead>
                     <tr className="border-b border-gray-100">
                         {["Foto", "Nome", "Categoria", "Preço", ""].map((h) => (
                             <th
                                 key={h}
-                                className={`py-3 px-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider ${h === "" ? "text-right" : "text-left"}`}
+                                className={`py-2 md:py-3 px-2 md:px-4 text-[10px] md:text-[11px] font-bold text-gray-400 uppercase tracking-wider ${h === "" ? "text-right" : "text-left"}`}
                             >
-                                {h}
+                                {h === "Categoria" ? <span className="hidden sm:inline">Categoria</span> : h === "Nome" ? <span className="hidden sm:inline">Nome</span> : h}
                             </th>
                         ))}
                     </tr>
@@ -460,50 +488,50 @@ function TabelaProdutos({ produtos, onEditar, onExcluir, carregando }) {
                                 className="border-b border-gray-50 hover:bg-orange-50/50 transition-colors"
                             >
                                 {/* Foto */}
-                                <td className="py-3 px-4">
-                                    <div className="w-10 h-10 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 flex items-center justify-center flex-shrink-0">
+                                <td className="py-2 md:py-3 px-2 md:px-4">
+                                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl overflow-hidden bg-gray-100 border border-gray-200 flex items-center justify-center flex-shrink-0">
                                         {p.photo
                                             ? <img src={p.photo} alt={p.name} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = "none"; }} />
-                                            : <span className="text-gray-300"><IcImagem size={18} /></span>}
+                                            : <span className="text-gray-300"><IcImagem size={14} /></span>}
                                     </div>
                                 </td>
 
                                 {/* Nome */}
-                                <td className="py-3 px-4 max-w-[180px]">
-                                    <p className="font-semibold text-gray-800 truncate">{p.name}</p>
+                                <td className="py-2 md:py-3 px-2 md:px-4 max-w-[120px] md:max-w-[180px]">
+                                    <p className="font-semibold text-gray-800 truncate text-xs md:text-sm">{p.name}</p>
                                     {p.description && (
-                                        <p className="text-xs text-gray-400 truncate mt-0.5">{p.description}</p>
+                                        <p className="text-[10px] md:text-xs text-gray-400 truncate mt-0.5 hidden sm:block">{p.description}</p>
                                     )}
                                 </td>
 
                                 {/* Categoria */}
-                                <td className="py-3 px-4">
-                                    <span className="inline-block bg-orange-100 text-[#D83D00] text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap">
+                                <td className="py-2 md:py-3 px-2 md:px-4">
+                                    <span className="inline-block bg-orange-100 text-[#D83D00] text-[10px] md:text-xs font-bold px-1.5 md:px-2.5 py-0.5 md:py-1 rounded-full whitespace-nowrap">
                                         {p.type}
                                     </span>
                                 </td>
 
                                 {/* Preço */}
-                                <td className="py-3 px-4">
-                                    <span className="font-bold text-[#D83D00] whitespace-nowrap">
+                                <td className="py-2 md:py-3 px-2 md:px-4">
+                                    <span className="font-bold text-[#D83D00] whitespace-nowrap text-xs md:text-sm">
                                         R$ {Number(p.price).toFixed(2)}
                                     </span>
                                 </td>
 
                                 {/* Ações */}
-                                <td className="py-3 px-4 text-right">
-                                    <div className="flex items-center justify-end gap-2">
+                                <td className="py-2 md:py-3 px-2 md:px-4 text-right">
+                                    <div className="flex items-center justify-end gap-1 md:gap-2">
                                         <button
                                             onClick={() => onEditar(p)}
-                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#D83D00] bg-orange-50 hover:bg-orange-100 border border-orange-100 transition-colors"
+                                            className="flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1.5 rounded-lg md:rounded-xl text-xs font-semibold text-[#D83D00] bg-orange-50 hover:bg-orange-100 border border-orange-100 transition-colors"
                                         >
-                                            <IcEditar /> Editar
+                                            <IcEditar /> <span className="hidden md:inline">Editar</span>
                                         </button>
                                         <button
                                             onClick={() => onExcluir(p)}
-                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 transition-colors"
+                                            className="flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1.5 rounded-lg md:rounded-xl text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 transition-colors"
                                         >
-                                            <IcLixo /> Excluir
+                                            <IcLixo /> <span className="hidden md:inline">Excluir</span>
                                         </button>
                                     </div>
                                 </td>
@@ -519,10 +547,10 @@ function TabelaProdutos({ produtos, onEditar, onExcluir, carregando }) {
 // CARD DE ESTATÍSTICA
 function StatCard({ label, valor, detalhe }) {
     return (
-        <div className="bg-white rounded-2xl px-5 py-4 border border-gray-100 shadow-sm flex flex-col gap-0.5">
-            <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wider">{label}</p>
-            <p className="text-2xl font-black text-gray-800 leading-tight">{valor}</p>
-            {detalhe && <p className="text-xs text-gray-400">{detalhe}</p>}
+        <div className="bg-white rounded-2xl px-4 md:px-5 py-3 md:py-4 border border-gray-100 shadow-sm flex flex-col gap-0.5 min-w-0">
+            <p className="text-[10px] md:text-[11px] text-gray-400 font-bold uppercase tracking-wider truncate">{label}</p>
+            <p className="text-xl md:text-2xl font-black text-gray-800 leading-tight truncate">{valor}</p>
+            {detalhe && <p className="text-xs text-gray-400 truncate">{detalhe}</p>}
         </div>
     );
 }
@@ -539,6 +567,7 @@ export default function Dashboard() {
     const [aExcluir, setAExcluir] = useState(null);
     const [salvando, setSalvando] = useState(false);
     const [busca, setBusca] = useState("");
+    const [sidebarAberta, setSidebarAberta] = useState(false);
 
     const { toasts, addToast, removeToast } = useToasts();
 
@@ -558,24 +587,43 @@ export default function Dashboard() {
         }
     }, [addToast]);
 
+    // Recarrega a lista silenciosamente (sem mostrar loading)
+    const recarregarProdutos = useCallback(async () => {
+        try {
+            const res = await fetch(`${API_URL}/api/products/`);
+            if (!res.ok) throw new Error("Falha ao buscar produtos");
+            const data = await res.json();
+            setProdutos(Array.isArray(data) ? data : []);
+        } catch {
+            // silencioso — evita toasts duplicados
+        }
+    }, []);
+
     useEffect(() => { carregarProdutos(); }, [carregarProdutos]);
 
     // ── Sair ──────────────────────────────────────────────────────────────────
-    const handleSair = () => { logout(); navigate("/admin/login"); };
+    const handleSair = () => { logout(); navigate("/"); };
 
     // ── Abrir modal ───────────────────────────────────────────────────────────
     const abrirCriar = () => { setEditando(null); setModalAberto(true); };
     const abrirEditar = (p) => { setEditando(p); setModalAberto(true); };
     const fecharModal = () => { setModalAberto(false); setEditando(null); };
 
+    const normalizarPreco = (v) => String(v).replace(",", ".");
+
     // ── POST / PUT ────────────────────────────────────────────────────────────
     const handleSalvar = async ({ fotoArq, ...campos }) => {
         setSalvando(true);
         const token = getToken();
+        if (!token) {
+            addToast("Sessão expirada. Faça login novamente.", "error");
+            setSalvando(false);
+            return;
+        }
         try {
             const payload = {
                 name: campos.name.trim(),
-                price: Number(campos.price),
+                price: Number(normalizarPreco(campos.price)),
                 type: campos.type,
                 description: campos.description?.trim() || "",
                 amount: Number(campos.amount) || 1,
@@ -608,8 +656,8 @@ export default function Dashboard() {
                 try { data = await res.json(); } catch { data = {}; }
                 if (!res.ok) throw new Error(data.error || `Erro ao criar produto (status ${res.status})`);
 
-                setProdutos((prev) => [data, ...prev]);
                 addToast("Produto cadastrado com sucesso!", "success");
+                recarregarProdutos();
             }
             fecharModal();
         } catch (err) {
@@ -624,6 +672,11 @@ export default function Dashboard() {
         if (!aExcluir) return;
         setSalvando(true);
         const token = getToken();
+        if (!token) {
+            addToast("Sessão expirada. Faça login novamente.", "error");
+            setSalvando(false);
+            return;
+        }
         const id = aExcluir._id || aExcluir.id;
         try {
             const res = await fetch(`${API_URL}/api/products/${id}`, {
@@ -640,9 +693,9 @@ export default function Dashboard() {
                 }
                 throw new Error(errorMsg);
             }
-            setProdutos((prev) => prev.filter((p) => (p._id || p.id) !== id));
             addToast(`"${aExcluir.name}" foi excluído.`, "success");
             setAExcluir(null);
+            recarregarProdutos();
         } catch (err) {
             addToast(err.message || "Erro ao excluir produto.", "error");
         } finally {
@@ -671,40 +724,49 @@ export default function Dashboard() {
         <div className="flex min-h-screen bg-gray-50 font-sans">
 
             {/* ── Sidebar ── */}
-            <Sidebar ativa={paginaAtiva} onNavegar={setPaginaAtiva} onSair={handleSair} />
+            <Sidebar ativa={paginaAtiva} onNavegar={setPaginaAtiva} onSair={handleSair} mobileAberta={sidebarAberta} onFecharMobile={() => setSidebarAberta(false)} />
 
             {/* ── Área principal ── */}
             <div className="flex-1 flex flex-col min-w-0">
 
                 {/* Topbar */}
-                <header className="bg-white border-b border-gray-100 px-8 py-5 flex items-center justify-between shadow-sm">
-                    <div>
-                        <h1 className="text-gray-800 font-black text-xl tracking-tight">
-                            {paginaAtiva === "produtos" ? "Produtos" : "Visão Geral"}
-                        </h1>
-                        <p className="text-gray-400 text-sm mt-0.5">
-                            {produtos.length} produto{produtos.length !== 1 ? "s" : ""} cadastrado{produtos.length !== 1 ? "s" : ""}
-                        </p>
+                <header className="bg-white border-b border-gray-100 px-4 md:px-8 py-3 md:py-5 flex items-center justify-between shadow-sm gap-2">
+                    <div className="flex items-center gap-3 min-w-0">
+                        <button
+                            onClick={() => setSidebarAberta(true)}
+                            className="md:hidden text-gray-500 hover:text-[#D83D00] p-1.5 -ml-1 rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0"
+                            aria-label="Abrir menu"
+                        >
+                            <IcMenu />
+                        </button>
+                        <div className="min-w-0">
+                            <h1 className="text-gray-800 font-black text-lg md:text-xl tracking-tight truncate">
+                                {paginaAtiva === "produtos" ? "Produtos" : "Visão Geral"}
+                            </h1>
+                            <p className="text-gray-400 text-xs md:text-sm mt-0.5 truncate">
+                                {produtos.length} produto{produtos.length !== 1 ? "s" : ""} cadastrado{produtos.length !== 1 ? "s" : ""}
+                            </p>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
                         <Link
                             to="/"
-                            className="text-sm font-semibold text-gray-500 hover:text-[#D83D00] transition-colors"
+                            className="text-xs md:text-sm font-semibold text-gray-500 hover:text-[#D83D00] transition-colors whitespace-nowrap"
                         >
                             Ver loja →
                         </Link>
                         <button
                             onClick={abrirCriar}
-                            className="flex items-center gap-2 px-5 py-2.5 bg-[#D83D00] text-white text-sm font-bold rounded-2xl hover:brightness-110 active:scale-95 transition-all"
+                            className="flex items-center gap-1 md:gap-2 px-3 md:px-5 py-2 md:py-2.5 bg-[#D83D00] text-white text-xs md:text-sm font-bold rounded-xl md:rounded-2xl hover:brightness-110 active:scale-95 transition-all whitespace-nowrap"
                             style={{ boxShadow: "0 4px 16px rgba(216,61,0,0.35)" }}
                         >
-                            <IcMais /> Novo Produto
+                            <IcMais /> <span className="hidden sm:inline">Novo Produto</span><span className="sm:hidden">Novo</span>
                         </button>
                     </div>
                 </header>
 
                 {/* Conteúdo */}
-                <main className="flex-1 px-8 py-6 flex flex-col gap-6">
+                <main className="flex-1 px-4 md:px-8 py-4 md:py-6 flex flex-col gap-4 md:gap-6">
 
                     {/* Stats */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -721,18 +783,18 @@ export default function Dashboard() {
                     {/* Card da tabela */}
                     <div className="bg-white rounded-3xl border border-gray-100 shadow-sm flex flex-col overflow-hidden flex-1">
                         {/* Cabeçalho do card */}
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 gap-4">
-                            <h2 className="font-bold text-gray-800">Lista de produtos</h2>
-                            <div className="relative">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-gray-100 gap-3">
+                            <h2 className="font-bold text-gray-800 text-sm md:text-base">Lista de produtos</h2>
+                            <div className="relative w-full sm:w-auto">
                                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                                     <IcBusca />
                                 </span>
                                 <input
                                     type="text"
-                                    placeholder="Buscar por nome ou categoria..."
+                                    placeholder="Buscar..."
                                     value={busca}
                                     onChange={(e) => setBusca(e.target.value)}
-                                    className="pl-9 pr-4 py-2 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:border-[#D83D00] focus:ring-2 focus:ring-[#D83D00]/20 transition-all w-64"
+                                    className="pl-9 pr-4 py-2 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:border-[#D83D00] focus:ring-2 focus:ring-[#D83D00]/20 transition-all w-full sm:w-56 md:w-64"
                                 />
                             </div>
                         </div>
