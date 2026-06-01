@@ -2,29 +2,34 @@ import React, { createContext, useContext, useState } from "react";
 
 const CartContext = createContext();
 
+function getId(produto) {
+    return produto._id || produto.id;
+}
+
 export function CartProvider({ children }) {
     const [itens, setItens] = useState([]);
 
     function adicionarItem(produto) {
+        const produtoId = getId(produto);
         setItens((prev) => {
-            const existe = prev.find((i) => i.id === produto.id);
+            const existe = prev.find((i) => getId(i) === produtoId);
             if (existe) {
                 return prev.map((i) =>
-                    i.id === produto.id ? { ...i, quantidade: i.quantidade + 1 } : i
+                    getId(i) === produtoId ? { ...i, quantidade: i.quantidade + 1 } : i
                 );
             }
             return [...prev, { ...produto, quantidade: 1 }];
         });
     }
 
-    function removerItem(id) {
-        setItens((prev) => prev.filter((i) => i.id !== id));
+    function removerItem(produtoId) {
+        setItens((prev) => prev.filter((i) => getId(i) !== produtoId));
     }
 
-    function alterarQuantidade(id, delta) {
+    function alterarQuantidade(produtoId, delta) {
         setItens((prev) =>
             prev
-                .map((i) => (i.id === id ? { ...i, quantidade: i.quantidade + delta } : i))
+                .map((i) => (getId(i) === produtoId ? { ...i, quantidade: i.quantidade + delta } : i))
                 .filter((i) => i.quantidade > 0)
         );
     }
