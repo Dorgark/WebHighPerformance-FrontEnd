@@ -62,10 +62,10 @@ export default function Cadastro() {
         setCarregando(true);
         try {
             await cadastrarUsuario(nome.trim(), email.trim(), senha, telefone.trim());
-            
+
             // Salva o nome para quando ele for redirecionado
             localStorage.setItem("userName", nome.trim());
-            
+
             setSucesso("Conta criada com sucesso! Redirecionando para o login...");
             setTimeout(() => navigate("/"), 2000);
         } catch (err) {
@@ -106,16 +106,15 @@ export default function Cadastro() {
                 }}
             >
                 {/* Botão Voltar */}
-                <button
-                    type="button"
-                    onClick={() => navigate(-1)}
+                <Link
+                    to="/"
                     className="absolute top-4 left-4 flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium transition-all duration-200 hover:-translate-x-0.5 group"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
                         <path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z" />
                     </svg>
                     Voltar
-                </button>
+                </Link>
 
                 {/* Título */}
                 <h1 className="text-white text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-center tracking-tight">

@@ -51,16 +51,16 @@ export default function Login() {
         setCarregando(true);
         try {
             const data = await loginUsuario(email.trim(), senha);
-            
+
             // Tenta obter o nome vindo da API, senão deduz do e-mail
             const parteNome = email.trim().split("@")[0];
             const nomeFormatado = parteNome.charAt(0).toUpperCase() + parteNome.slice(1);
             const nomeExibicao = data?.name || data?.user?.name || nomeFormatado;
-            
+
             localStorage.setItem("userName", nomeExibicao);
-            
-            // Login bem-sucedido → vai para a home
-            navigate("/home");
+
+            // Login bem-sucedido → vai para o dashboard administrativo
+            navigate("/admin/dashboard");
         } catch (err) {
             setErro(err.message || "email ou senha inválidos");
         } finally {
@@ -99,18 +99,19 @@ export default function Login() {
                 }}
             >
                 {/* Botão Voltar */}
-                <button
-                    type="button"
-                    onClick={() => navigate(-1)}
+                <Link
+                    to="/"
                     className="absolute top-4 left-4 flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium transition-all duration-200 hover:-translate-x-0.5 group"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
                         <path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z" />
                     </svg>
                     Voltar
-                </button>
+                </Link>
 
-                {/* Título — desktop only */}
+
+
+                {/* Título */}
                 <h1 className="text-white text-xl sm:text-2xl font-bold mb-8 text-center tracking-tight">
                     Área Administrativa
                 </h1>
