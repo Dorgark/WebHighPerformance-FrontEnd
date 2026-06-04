@@ -32,6 +32,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/carrinho" element={<CartDrawer />} />
+
+          {/* Rotas de Admin (Requer Login) */}
           <Route
             path="/admin/login"
             element={
@@ -48,6 +50,16 @@ function App() {
               </PublicRoute>
             }
           />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Redirecionamentos de Segurança */}
           <Route path="/home" element={<Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
