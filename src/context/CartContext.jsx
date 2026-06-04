@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useCallback } from "react";
 
 const CartContext = createContext();
 
@@ -8,6 +8,15 @@ function getId(produto) {
 
 export function CartProvider({ children }) {
     const [itens, setItens] = useState([]);
+    const [toasts, setToasts] = useState([]);
+
+    const dispararToast = useCallback((nome) => {
+        const key = Date.now();
+        setToasts((prev) => [...prev, { nome, key }]);
+        setTimeout(() => {
+            setToasts((prev) => prev.filter((t) => t.key !== key));
+        }, 3000);
+    }, []);
 
     function adicionarItem(produto) {
         const produtoId = getId(produto);
@@ -20,6 +29,7 @@ export function CartProvider({ children }) {
             }
             return [...prev, { ...produto, quantidade: 1 }];
         });
+        dispararToast(produto.name);
     }
 
     function removerItem(produtoId) {
@@ -42,7 +52,7 @@ export function CartProvider({ children }) {
 
     return (
         <CartContext.Provider
-            value={{ itens, adicionarItem, removerItem, alterarQuantidade, totalItens, totalPreco }}
+            value={{ itens, adicionarItem, removerItem, alterarQuantidade, totalItens, totalPreco, toasts }}
         >
             {children}
         </CartContext.Provider>
