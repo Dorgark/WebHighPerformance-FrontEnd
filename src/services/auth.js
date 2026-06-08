@@ -32,6 +32,11 @@ export async function cadastrarUsuario(name, email, password, number) {
         throw new Error(data.error || "Erro ao cadastrar. Tente novamente.");
     }
 
+    // Se a API retornar um token, salva automaticamente (login automático)
+    if (data.token) {
+        localStorage.setItem("token", data.token);
+    }
+
     return data;
 }
 
@@ -82,5 +87,19 @@ export function getToken() {
 
 
 export function isAuthenticated() {
-    return Boolean(localStorage.getItem("token"));
+    const token = localStorage.getItem("token");
+    if (!token) return false;
+    // Verifica se o token JWT não está expirado
+    try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        if (payload.exp && Date.now() / 1000 > payload.exp) {
+            localStorage.removeItem("token");
+            return false;
+        }
+    } catch {
+        // Token malformado — remove
+        localStorage.removeItem("token");
+        return false;
+    }
+    return true;
 }
