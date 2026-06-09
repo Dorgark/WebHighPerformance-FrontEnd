@@ -69,10 +69,7 @@ const IcMenu = () => (
     </svg>
 );
 
-// ─── CATEGORIAS ───────────────────────────────────────────────────────────────
-const CATEGORIAS = ["Limpeza", "Higiene", "Descartáveis", "Construção", "Outros"];
 
-// ═════════════════════════════════════════════════════════════════════════════
 // TOAST
 // ═════════════════════════════════════════════════════════════════════════════
 function useToasts() {
@@ -201,7 +198,14 @@ const FORM_VAZIO = {
     amount: "1"
 };
 
-function ModalProduto({ aberto, onFechar, onSalvar, editando, salvando }) {
+function ModalProduto({
+    aberto,
+    onFechar,
+    onSalvar,
+    editando,
+    salvando,
+    categorias
+}) {
     const [form, setForm] = useState(FORM_VAZIO);
     const [fotoArq, setFotoArq] = useState(null);
     const [fotoPreview, setFotoPreview] = useState(null);
@@ -381,7 +385,11 @@ function ModalProduto({ aberto, onFechar, onSalvar, editando, salvando }) {
                                 disabled={salvando}
                             >
                                 <option value="">Selecionar...</option>
-                                {CATEGORIAS.map((c) => <option key={c} value={c}>{c}</option>)}
+                                {categorias.map((c) => (
+                                    <option key={c} value={c}>
+                                        {c}
+                                    </option>
+                                ))}
                             </select>
                             {erros.type && <span className="text-red-500 text-xs">{erros.type}</span>}
                             {form.type === "Outros" && (
@@ -616,6 +624,18 @@ export default function Dashboard() {
 
     const [paginaAtiva, setPaginaAtiva] = useState("produtos");
     const [produtos, setProdutos] = useState([]);
+    const categoriasDisponiveis = [
+        "Outros",
+        ...new Set(
+            produtos
+                .map((p) => p.type)
+                .filter(
+                    (tipo) =>
+                        tipo &&
+                        tipo.toLowerCase() !== "outros"
+                )
+        )
+    ];
     const [carregando, setCarregando] = useState(true);
     const [modalAberto, setModalAberto] = useState(false);
     const [editando, setEditando] = useState(null);
@@ -629,10 +649,16 @@ export default function Dashboard() {
     // ── Carregar produtos ──────────────────────────────────────────────────────
     const carregarProdutos = useCallback(async () => {
         setCarregando(true);
+
         try {
             const res = await fetch(`${API_URL}/api/products/`);
-            if (!res.ok) throw new Error("Falha ao buscar produtos");
+
+            if (!res.ok) {
+                throw new Error("Falha ao buscar produtos");
+            }
+
             const data = await res.json();
+
             setProdutos(Array.isArray(data) ? data : []);
         } catch {
             addToast("Não foi possível carregar os produtos.", "error");
@@ -725,34 +751,53 @@ export default function Dashboard() {
     // ── DELETE ────────────────────────────────────────────────────────────────
     const handleExcluir = async () => {
         if (!aExcluir) return;
+
         setSalvando(true);
+
         const token = getToken();
+
         if (!token) {
             addToast("Sessão expirada. Faça login novamente.", "error");
             setSalvando(false);
             return;
         }
+
         const id = aExcluir._id || aExcluir.id;
+
         try {
             const res = await fetch(`${API_URL}/api/products/${id}`, {
                 method: "DELETE",
-                headers: { Authorization: `Bearer ${token}` },
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             });
+
+            console.log("Status:", res.status);
+            console.log("ID:", id);
+
             if (!res.ok) {
                 let errorMsg = "Erro ao excluir produto";
+
                 try {
                     const data = await res.json();
                     errorMsg = data.error || errorMsg;
                 } catch {
                     errorMsg = `${errorMsg} (status ${res.status})`;
                 }
+
                 throw new Error(errorMsg);
             }
+
             addToast(`"${aExcluir.name}" foi excluído.`, "success");
+
             setAExcluir(null);
+
             recarregarProdutos();
         } catch (err) {
-            addToast(err.message || "Erro ao excluir produto.", "error");
+            addToast(
+                err.message || "Erro ao excluir produto.",
+                "error"
+            );
         } finally {
             setSalvando(false);
         }
@@ -871,6 +916,7 @@ export default function Dashboard() {
                 onSalvar={handleSalvar}
                 editando={editando}
                 salvando={salvando}
+                categorias={categoriasDisponiveis}
             />
             <ModalConfirmar
                 aberto={!!aExcluir}
