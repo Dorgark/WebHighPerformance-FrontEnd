@@ -192,7 +192,14 @@ function Sidebar({ ativa, onNavegar, onSair, mobileAberta, onFecharMobile }) {
 }
 
 // MODAL DE PRODUTO (Cadastro / Edição)
-const FORM_VAZIO = { name: "", price: "", type: "", description: "", amount: "1" };
+const FORM_VAZIO = {
+    name: "",
+    price: "",
+    type: "",
+    customCategory: "",
+    description: "",
+    amount: "1"
+};
 
 function ModalProduto({ aberto, onFechar, onSalvar, editando, salvando }) {
     const [form, setForm] = useState(FORM_VAZIO);
@@ -209,6 +216,7 @@ function ModalProduto({ aberto, onFechar, onSalvar, editando, salvando }) {
                 name: editando.name || "",
                 price: editando.price || "",
                 type: editando.type || "",
+                customCategory: "",
                 description: editando.description || "",
                 amount: editando.amount || "1",
             });
@@ -225,10 +233,25 @@ function ModalProduto({ aberto, onFechar, onSalvar, editando, salvando }) {
 
     const validar = () => {
         const e = {};
-        if (!form.name.trim()) e.name = "Nome obrigatório";
+
+        if (!form.name.trim())
+            e.name = "Nome obrigatório";
+
         const precoNorm = normalizarPreco(form.price);
-        if (!precoNorm || isNaN(precoNorm) || +precoNorm <= 0) e.price = "Preço inválido";
-        if (!form.type) e.type = "Selecione uma categoria";
+
+        if (!precoNorm || isNaN(precoNorm) || +precoNorm <= 0)
+            e.price = "Preço inválido";
+
+        if (!form.type)
+            e.type = "Selecione uma categoria";
+
+        if (
+            form.type === "Outros" &&
+            !form.customCategory.trim()
+        ) {
+            e.customCategory = "Digite uma categoria";
+        }
+
         setErros(e);
         return !Object.keys(e).length;
     };
@@ -244,8 +267,17 @@ function ModalProduto({ aberto, onFechar, onSalvar, editando, salvando }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
         if (!validar()) return;
-        onSalvar({ ...form, fotoArq });
+
+        onSalvar({
+            ...form,
+            type:
+                form.type === "Outros"
+                    ? form.customCategory
+                    : form.type,
+            fotoArq
+        });
     };
 
     if (!aberto) return null;
@@ -352,6 +384,29 @@ function ModalProduto({ aberto, onFechar, onSalvar, editando, salvando }) {
                                 {CATEGORIAS.map((c) => <option key={c} value={c}>{c}</option>)}
                             </select>
                             {erros.type && <span className="text-red-500 text-xs">{erros.type}</span>}
+                            {form.type === "Outros" && (
+                                <>
+                                    <input
+                                        type="text"
+                                        className={inputCls("customCategory")}
+                                        placeholder="Digite a nova categoria"
+                                        value={form.customCategory}
+                                        onChange={(e) =>
+                                            setForm((f) => ({
+                                                ...f,
+                                                customCategory: e.target.value
+                                            }))
+                                        }
+                                        disabled={salvando}
+                                    />
+
+                                    {erros.customCategory && (
+                                        <span className="text-red-500 text-xs">
+                                            {erros.customCategory}
+                                        </span>
+                                    )}
+                                </>
+                            )}
                         </div>
                     </div>
 
