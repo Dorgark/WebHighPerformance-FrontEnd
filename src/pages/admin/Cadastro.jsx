@@ -61,13 +61,19 @@ export default function Cadastro() {
 
         setCarregando(true);
         try {
-            await cadastrarUsuario(nome.trim(), email.trim(), senha, telefone.trim());
+            const result = await cadastrarUsuario(nome.trim(), email.trim(), senha, telefone.trim());
 
-            // Salva o nome para quando ele for redirecionado
+            // Salva o nome para exibição posterior
             localStorage.setItem("userName", nome.trim());
 
-            setSucesso("Conta criada com sucesso! Redirecionando para o login...");
-            setTimeout(() => navigate("/"), 2000);
+            // Se a API retornou token (login automático), vai direto pra home
+            if (result?.token || localStorage.getItem("token")) {
+                setSucesso("Conta criada com sucesso! Entrando...");
+                setTimeout(() => navigate("/"), 1500);
+            } else {
+                setSucesso("Conta criada com sucesso! Redirecionando para o login...");
+                setTimeout(() => navigate("/admin/login"), 2000);
+            }
         } catch (err) {
             // Exibe exatamente o erro retornado pela API
             setErro(err.message || "Erro ao cadastrar. Tente novamente.");

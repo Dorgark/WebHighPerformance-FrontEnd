@@ -112,9 +112,9 @@ function ToastContainer({ toasts, onRemove }) {
 
 // SIDEBAR
 const NAV = [
-    { id: "dashboard", label: "Visão Geral", icon: <IcHome /> },
     { id: "produtos", label: "Produtos", icon: <IcPacote /> },
 ];
+
 
 function Sidebar({ ativa, onNavegar, onSair, mobileAberta, onFecharMobile }) {
     const content = (
@@ -622,7 +622,6 @@ function StatCard({ label, valor, detalhe }) {
 export default function Dashboard() {
     const navigate = useNavigate();
 
-    const [paginaAtiva, setPaginaAtiva] = useState("produtos");
     const [produtos, setProdutos] = useState([]);
     const categoriasDisponiveis = [
         "Outros",
@@ -824,7 +823,8 @@ export default function Dashboard() {
         <div className="flex min-h-screen bg-gray-50 font-sans">
 
             {/* ── Sidebar ── */}
-            <Sidebar ativa={paginaAtiva} onNavegar={setPaginaAtiva} onSair={handleSair} mobileAberta={sidebarAberta} onFecharMobile={() => setSidebarAberta(false)} />
+            <Sidebar ativa="produtos" onNavegar={() => {}} onSair={handleSair} mobileAberta={sidebarAberta} onFecharMobile={() => setSidebarAberta(false)} />
+
 
             {/* ── Área principal ── */}
             <div className="flex-1 flex flex-col min-w-0">
@@ -841,7 +841,7 @@ export default function Dashboard() {
                         </button>
                         <div className="min-w-0">
                             <h1 className="text-gray-800 font-black text-lg md:text-xl tracking-tight truncate">
-                                {paginaAtiva === "produtos" ? "Produtos" : "Visão Geral"}
+                                Produtos
                             </h1>
                             <p className="text-gray-400 text-xs md:text-sm mt-0.5 truncate">
                                 {produtos.length} produto{produtos.length !== 1 ? "s" : ""} cadastrado{produtos.length !== 1 ? "s" : ""}
