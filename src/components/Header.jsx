@@ -65,9 +65,9 @@ function Header() {
           </div>
         </div>
 
-        {/* Lado Direito: Botão de Perfil se deslogado / Nome + Sair se logado */}
+        {/* Lado Direito: Nome + Dashboard + Sair (visível apenas para admin logado) */}
         <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
-          {logado ? (
+          {logado && (
             <>
               <div className="bg-white p-2.5 rounded-full shadow-sm border-[0.15rem] border-white/10 flex-shrink-0">
                 <UserIcon size={25} color="#000000" />
@@ -88,10 +88,6 @@ function Header() {
                 Sair
               </button>
             </>
-          ) : (
-            <Link to={'/admin/login'} className="bg-white p-2.5 rounded-full shadow-sm hover:scale-105 border-[0.15rem] transition-transform flex-shrink-0">
-              <UserIcon size={25} color="#000000" />
-            </Link>
           )}
         </div>
       </div>
