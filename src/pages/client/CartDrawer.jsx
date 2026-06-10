@@ -2,8 +2,6 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 
-const resolveImage = (p) => p?.imageUrl || p?.image?.url || p?.image || p?.photo?.url || p?.photo || null;
-
 function getId(item) {
     return item._id || item.id;
 }
@@ -44,8 +42,8 @@ export default function CartDrawer() {
         return (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex gap-4 items-center">
                 <div className="w-20 h-20 bg-gray-100 rounded-xl flex-shrink-0 flex items-center justify-center">
-                    {resolveImage(item) ? (
-                        <img src={resolveImage(item)} alt={item.name} className="w-full h-full object-contain rounded-xl" />
+                    {item.image ? (
+                        <img src={item.image} alt={item.name} className="w-full h-full object-contain rounded-xl" />
                     ) : (
                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#d1d5db" viewBox="0 0 256 256">
                             <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM216,56V158.05l-45.66-45.65a16,16,0,0,0-22.62,0L96,164.05,62.28,130.34a16,16,0,0,0-22.62,0L24,146.05V56ZM24,168.69l27-27,45.65,45.66a16,16,0,0,0,22.63,0L171,135.66l45,45V200H24Z" />
