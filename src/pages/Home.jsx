@@ -6,9 +6,6 @@ import Filtros from "../components/Filter.jsx";
 import { useCart } from "../context/CartContext.jsx";
 import BotaoCarrinho from "../components/BotaoCarrinho.jsx";
 
-const API_URL = import.meta.env.VITE_API_URL || "https://webhighperformance-backend.onrender.com";
-const resolveImage = (p) => p?.imageUrl || p?.image?.url || p?.image || p?.photo?.url || p?.photo || null;
-
 function Home() {
   const [categorias, setCategorias] = useState([]);
   const [estaCarregando, setEstaCarregando] = useState(true);
@@ -21,7 +18,7 @@ function Home() {
   useEffect(() => {
     const buscarDadosDoBanco = async () => {
       try {
-        const resposta = await fetch(`${API_URL}/api/products/`);
+        const resposta = await fetch("https://web-high-performance-back-end.vercel.app/api/products/");
         const produtosDaAPI = await resposta.json();
 
         const categoriasAgrupadas = {};
@@ -77,7 +74,7 @@ function Home() {
                     className="cursor-pointer transform transition-transform hover:-translate-y-1"
                     onClick={() => setProdutoModal(produto)}
                   >
-                    <Card imagem={resolveImage(produto)} titulo={produto.name} preco={produto.price} produto={produto} />
+                    <Card imagem={null} titulo={produto.name} preco={produto.price} produto={produto} />
                   </div>
                 ))}
               </div>
@@ -112,7 +109,7 @@ function Home() {
                     className="cursor-pointer transform transition-transform hover:-translate-y-1"
                     onClick={() => setProdutoModal(produto)}
                   >
-                    <Card imagem={resolveImage(produto)} titulo={produto.name} preco={produto.price} produto={produto} />
+                    <Card imagem={null} titulo={produto.name} preco={produto.price} produto={produto} />
                   </div>
                 ))}
             </div>
@@ -141,7 +138,7 @@ function Home() {
                     className="min-w-[160px] max-w-[200px] snap-center transition-transform duration-300 hover:-translate-y-2 cursor-pointer"
                     onClick={() => setProdutoModal(produto)}
                   >
-                    <Card imagem={resolveImage(produto)} titulo={produto.name} preco={produto.price} produto={produto} />
+                    <Card imagem={null} titulo={produto.name} preco={produto.price} produto={produto} />
                   </div>
                 ))}
 
@@ -181,16 +178,12 @@ function Home() {
             </button>
 
             <div className="h-48 w-full bg-gray-100 flex items-center justify-center p-4">
-              {resolveImage(produtoModal) ? (
-                <img src={resolveImage(produtoModal)} alt={produtoModal.name} className="w-full h-full object-cover" />
-              ) : (
-                <div className="text-gray-300 flex flex-col items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 256 256">
-                    <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM216,56V158.05l-45.66-45.65a16,16,0,0,0-22.62,0L96,164.05,62.28,130.34a16,16,0,0,0-22.62,0L24,146.05V56ZM24,168.69l27-27,45.65,45.66a16,16,0,0,0,22.63,0L171,135.66l45,45V200H24Z" />
-                  </svg>
-                  <span className="text-sm mt-2">Sem imagem</span>
-                </div>
-              )}
+              <div className="text-gray-300 flex flex-col items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 256 256">
+                  <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM216,56V158.05l-45.66-45.65a16,16,0,0,0-22.62,0L96,164.05,62.28,130.34a16,16,0,0,0-22.62,0L24,146.05V56ZM24,168.69l27-27,45.65,45.66a16,16,0,0,0,22.63,0L171,135.66l45,45V200H24Z" />
+                </svg>
+                <span className="text-sm mt-2">Sem imagem</span>
+              </div>
             </div>
 
             <div className="p-6">
