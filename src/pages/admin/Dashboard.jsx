@@ -620,36 +620,38 @@ export default function Dashboard() {
             return;
         }
         try {
-            const payload = {
-                name: campos.name.trim(),
-                price: Number(normalizarPreco(campos.price)),
-                type: campos.type,
-                description: campos.description?.trim() || "",
-                amount: Number(campos.amount) || 1,
-            };
+            const formData = new FormData();
+            formData.append("name", campos.name.trim());
+            formData.append("price", Number(normalizarPreco(campos.price)));
+            formData.append("type", campos.type);
+            formData.append("description", campos.description?.trim() || "");
+            formData.append("amount", Number(campos.amount) || 1);
+            if (fotoArq) {
+                formData.append("photo", fotoArq);
+            }
 
             if (editando) {
                 // PUT
                 const id = editando._id || editando.id;
                 const res = await fetch(`${API_URL}/api/products/${id}`, {
                     method: "PUT",
-                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-                    body: JSON.stringify(payload),
+                    headers: { Authorization: `Bearer ${token}` },
+                    body: formData,
                 });
                 let data;
                 try { data = await res.json(); } catch { data = {}; }
                 if (!res.ok) throw new Error(data.error || `Erro ao atualizar produto (status ${res.status})`);
 
                 setProdutos((prev) =>
-                    prev.map((p) => (p._id || p.id) === id ? { ...p, ...payload } : p)
+                    prev.map((p) => (p._id || p.id) === id ? { ...p, ...campos, photo: data.photo || p.photo } : p)
                 );
                 addToast("Produto atualizado com sucesso!", "success");
             } else {
                 // POST
                 const res = await fetch(`${API_URL}/api/products/`, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-                    body: JSON.stringify(payload),
+                    headers: { Authorization: `Bearer ${token}` },
+                    body: formData,
                 });
                 let data;
                 try { data = await res.json(); } catch { data = {}; }
@@ -723,7 +725,7 @@ export default function Dashboard() {
         <div className="flex min-h-screen bg-gray-50 font-sans">
 
             {/* ── Sidebar ── */}
-            <Sidebar ativa="produtos" onNavegar={() => {}} onSair={handleSair} mobileAberta={sidebarAberta} onFecharMobile={() => setSidebarAberta(false)} />
+            <Sidebar ativa="produtos" onNavegar={() => { }} onSair={handleSair} mobileAberta={sidebarAberta} onFecharMobile={() => setSidebarAberta(false)} />
 
 
             {/* ── Área principal ── */}
