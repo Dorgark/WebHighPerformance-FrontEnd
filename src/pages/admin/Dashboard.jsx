@@ -7,6 +7,8 @@ const API_URL =
     import.meta.env.VITE_API_URL ||
     "https://webhighperformance-backend.onrender.com";
 
+const resolveImage = (p) => p?.imageUrl || p?.image?.url || p?.image || p?.photo?.url || p?.photo || null;
+
 // ─── ÍCONES ───────────────────────────────────────────────────────────────────
 const IcPacote = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256">
@@ -224,7 +226,7 @@ function ModalProduto({
                 description: editando.description || "",
                 amount: editando.amount || "1",
             });
-            setFotoPreview(editando.photo || null);
+            setFotoPreview(resolveImage(editando));
         } else {
             setForm(FORM_VAZIO);
             setFotoPreview(null);
@@ -553,8 +555,8 @@ function TabelaProdutos({ produtos, onEditar, onExcluir, carregando }) {
                                 {/* Foto */}
                                 <td className="py-2 md:py-3 px-2 md:px-4">
                                     <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl overflow-hidden bg-gray-100 border border-gray-200 flex items-center justify-center flex-shrink-0">
-                                        {p.photo
-                                            ? <img src={p.photo} alt={p.name} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = "none"; }} />
+                                        {resolveImage(p)
+                                            ? <img src={resolveImage(p)} alt={p.name} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = "none"; }} />
                                             : <span className="text-gray-300"><IcImagem size={14} /></span>}
                                     </div>
                                 </td>
@@ -708,7 +710,7 @@ export default function Dashboard() {
             formData.append("description", campos.description?.trim() || "");
             formData.append("amount", Number(campos.amount) || 1);
             if (fotoArq) {
-                formData.append("photo", fotoArq);
+                formData.append("image", fotoArq);
             }
 
             if (editando) {
@@ -724,7 +726,7 @@ export default function Dashboard() {
                 if (!res.ok) throw new Error(data.error || `Erro ao atualizar produto (status ${res.status})`);
 
                 setProdutos((prev) =>
-                    prev.map((p) => (p._id || p.id) === id ? { ...p, ...campos, photo: data.photo || p.photo } : p)
+                    prev.map((p) => (p._id || p.id) === id ? { ...p, ...campos, image: data.image || p.image } : p)
                 );
                 addToast("Produto atualizado com sucesso!", "success");
             } else {
