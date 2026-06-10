@@ -44,13 +44,13 @@ export async function cadastrarUsuario(name, email, password, number) {
 export async function criarProduto(produto) {
     const token = getToken();
 
+    // Removido o Content-Type para o browser inferir multipart/form-data através do FormData
     const response = await fetch(`${API_URL}/api/products/`, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`,
         },
-        body: JSON.stringify(produto),
+        body: produto,
     });
 
     const data = await response.json();
