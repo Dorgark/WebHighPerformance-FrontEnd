@@ -12,7 +12,7 @@ export default function CartDrawer() {
     const navigate = useNavigate();
     const { itens, removerItem, alterarQuantidade, totalPreco } = useCart();
 
-    const whatsappNumero = "5581999999999";
+    const whatsappNumero = "5581987352425";
 
     function finalizarPedido() {
         if (itens.length === 0) return;
